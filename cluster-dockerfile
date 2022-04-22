@@ -1,0 +1,12 @@
+FROM ubuntu:20.04
+
+RUN apt update && \
+  DEBIAN_FRONTEND=noninteractive apt install -y redis-server supervisor 
+
+COPY ./cluster-files /app/cluster-files
+COPY ./set-up-cluster.sh /app/set-up-cluster.sh
+COPY ./supervisord.conf /etc/supervisor/supervisord.conf 
+
+CMD supervisord -c /etc/supervisor/supervisord.conf &&  sleep 3 && \
+redis-cli -a pass --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005 --cluster-replicas 1 --cluster-yes && \
+sleep infinity

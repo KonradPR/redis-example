@@ -1,0 +1,17 @@
+FROM ubuntu:20.04
+
+RUN apt update && \
+  DEBIAN_FRONTEND=noninteractive apt install -y  gdb  libboost-all-dev libuv1-dev build-essential git cmake libgtest-dev pkg-config ninja-build cmake 
+
+COPY ./ /app
+
+RUN cd /app/hiredis && make && make install
+RUN cd /app/redis-plus-plus && rm -rf build && mkdir gdb build && cd build && cmake -DREDIS_PLUS_PLUS_ASYNC_FUTURE=boost -DREDIS_PLUS_PLUS_BUILD_ASYNC=libuv -DREDIS_PLUS_PLUS_CXX_STANDARD=17 .. && make && make install
+
+RUN cd /app && \
+  mkdir build && \
+  cd build && \
+  cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && \
+  ninja
+RUN cp /app/build/server /usr/bin/server
+CMD  sleep 10 && /usr/bin/server

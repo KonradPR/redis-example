@@ -1,0 +1,23 @@
+services:
+  server:
+    container_name: server
+    build: 
+      context: .
+      dockerfile: base-dockerfile
+    restart: always
+    depends_on: 
+      - "cluster"
+  
+  cluster:
+    container_name: cluster
+    build: 
+      context: .
+      dockerfile: cluster-dockerfile
+    restart: always
+    ports:
+      - "7000:7000"
+      - "7001:7001"
+      - "7002:7002"
+      - "7003:7003"
+      - "7004:7004"
+      - "7005:7005"
